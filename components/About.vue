@@ -22,16 +22,16 @@
       </div>
 
       <!-- Highlight Box -->
-      <div class="bg-gray-800 p-8 rounded-2xl shadow-lg">
+      <div class="bg-gray-800 p-8 rounded-2xl shadow-xl">
         <h3 class="text-2xl font-semibold mb-6 text-blue-400">
           Highlights
         </h3>
 
         <ul class="space-y-4 text-gray-300">
-          <li>🚀 Frontend Development Focus</li>
-          <li>⚡ React & Tailwind CSS Enthusiast</li>
-          <li>🎨 UI/UX Oriented Mindset</li>
-          <li>📚 Social Media Development Strategy</li>
+          <li>Frontend Development Focus</li>
+          <li>React & Tailwind CSS Enthusiast</li>
+          <li>UI/UX Oriented Mindset</li>
+          <li>Social Media Development Strategy</li>
         </ul>
       </div>
 

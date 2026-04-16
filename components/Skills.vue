@@ -8,6 +8,7 @@ import mysql from '@/assets/MySQL.svg'
 import canva from '@/assets/Canva.svg'
 import figma from '@/assets/Figma.svg'
 import nuxt from '@/assets/Nuxt.svg'
+import vue from '@/assets/Vue.svg'
 
 
 const skills = [
@@ -20,7 +21,7 @@ const skills = [
     { name: "Canva", icon: canva },
     { name: "Figma", icon: figma },
     { name: "Nuxt", icon: nuxt },
-
+    { name: "Vue", icon:vue },
 ]
 </script>
 

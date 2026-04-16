@@ -34,7 +34,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="min-h-screen bg-gray-950 text-white flex items-center pt-24 pb-10 px-6 relative">
+  <section id="home" class="min-h-screen bg-gray-950 text-white flex items-center pt-24 pb-10 px-6 relative">
 
     <!-- Background Glow -->
     <div class="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl top-20 -left-20"></div>
@@ -89,7 +89,7 @@ onMounted(() => {
           <img
             :src="profile"
             alt="Bagas Profile"
-            class="w-full h-full object-cover object-top"
+            class="w-full h-full object-contain"
           />
         </div>
       </div>

@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
-    'nuxt-phosphor-icons'
+    'nuxt-phosphor-icons',
+    '@nuxt/fonts'
   ]
 })

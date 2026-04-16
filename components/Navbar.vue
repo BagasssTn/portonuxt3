@@ -1,10 +1,34 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+
+const activeSection = ref ('home')
+
+onMounted(() => {
+  const sections = document.querySelectorAll('section')
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          activeSection.value = entry.target.id
+        }
+      })
+    },
+    {
+      threshold: 0.3
+    }
+  )
+
+  sections.forEach((section) => {
+    observer.observe(section)
+  })
+})
 </script>
 
 <template>
-  <nav class="fixed w-full z-50 bg-gray-900/50 backdrop-blur-md">
+  <nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
 
       <!-- Logo -->
@@ -19,9 +43,9 @@ const route = useRoute()
           <NuxtLink
             to="/"
             class="group px-5 py-2 rounded-md text-base font-medium transition flex items-center"
-            :class="route.path === '/' && !route.hash
-              ? 'bg-gray-800/90 text-white ' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'home'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="house" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
           Home
@@ -32,9 +56,9 @@ const route = useRoute()
           <NuxtLink
             to="/#about"
             class="group flex items-center px-5 py-2 rounded-md text-base font-medium transition"
-            :class="route.hash === '#about' 
-              ? 'bg-gray-800/90 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'about'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="user" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             About
@@ -45,9 +69,9 @@ const route = useRoute()
           <NuxtLink
             to="/#experience"
             class="group flex items-center px-5 py-2 rounded-md text-base font-medium transition"
-            :class="route.hash === '#experience' 
-              ? 'bg-gray-800/90 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'experience'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="briefcase" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             Experience
@@ -58,9 +82,9 @@ const route = useRoute()
           <NuxtLink
             to="/#projects"
             class="group flex items-center px-5 py-2 rounded-md text-base font-medium transition"
-            :class="route.hash === '#projects' 
-              ? 'bg-gray-800/90 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'projects'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="archive" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             Projects
@@ -71,9 +95,9 @@ const route = useRoute()
           <NuxtLink
             to="/#skills"
             class="group flex items-center px-5 py-2 rounded-md text-base font-medium transition"
-            :class="route.hash === '#skills' 
-              ? 'bg-gray-800/90 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'skills'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="gear-six" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             Skills
@@ -84,17 +108,15 @@ const route = useRoute()
           <NuxtLink
             to="/#contact"
             class="group flex items-center px-5 py-2 rounded-md text-base font-medium transition"
-            :class="route.hash === '#contact' 
-              ? 'bg-gray-700 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-gray-800'"
+              :class="activeSection === 'contact'
+                ? 'bg-gray-800/90 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'"
           >
           <PhosphorIcon name="address-book" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             Contact
           </NuxtLink>
         </li>
-
       </ul>
-
     </div>
   </nav>
 </template>
