@@ -20,7 +20,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleEsc)
 })
 
-// disable scroll saat modal buka
+
 watch(selectedProject, (val) => {
   if (val) {
     document.body.style.overflow = 'hidden'
@@ -29,7 +29,6 @@ watch(selectedProject, (val) => {
   }
 })
 
-// IMPORT GAMBAR (pakai alias Nuxt @)
 import lms1 from '@/assets/lms1.png'
 import lms2 from '@/assets/lms2.png'
 import lms3 from '@/assets/lms3.png'
@@ -111,11 +110,11 @@ const projects = [
           <div class="bg-gray-800 flex items-center justify-center h-56">
             <img
               :src="project.screenshots[0]"
-              class="max-h-full object-contain group-hover:scale-105 transition"
+              class="max-h-full object-contain  group-hover:scale-105 transition"
             />
           </div>
 
-          <div class="p-6">
+          <div class="p-6 ">
             <h3 class="text-2xl font-semibold mb-3">
               {{ project.title }}
             </h3>

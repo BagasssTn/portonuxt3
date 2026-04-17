@@ -7,5 +7,8 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-phosphor-icons',
     '@nuxt/fonts'
-  ]
+  ],
+  colorMode: {
+    classSuffix:''
+  }
 })
