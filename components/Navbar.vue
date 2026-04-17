@@ -36,9 +36,9 @@ const toggleDark = () => {
 <template>
 <nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md
   bg-white/80 dark:bg-gray-900/80
-  text-white dark:text-white transition-colors duration-300">
-    <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
+  text-white dark:text-white shadow-md transition-colors duration-300">
 
+    <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
       <h1 class="text-2xl font-bold dark:text-blue-400 text-blue-950
       ">
         Bagas Tricahya

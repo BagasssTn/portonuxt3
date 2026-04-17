@@ -3,25 +3,23 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="bg-gray-950 text-white pt-24 pb-12 px-6 border-t border-gray-800">
+  <footer class="dark:bg-gray-950 bg-gray-100 text-white pt-24 pb-12 px-6 border-t border-gray-200">
     <div class="max-w-5xl mx-auto text-center">
 
-      <h2 class="text-4xl font-bold text-blue-400 mb-12">
+      <h2 class="text-4xl font-bold dark:text-blue-500 text-blue-700 mb-12">
         Bagas Tricahya Nugraha
       </h2>
 
-      <div class="bg-gray-900 border border-gray-800 p-10 rounded-3xl shadow-lg max-w-2xl mx-auto">
+      <div class="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-transparent p-10 rounded-3xl shadow-lg max-w-2xl mx-auto">
 
-        <h3 class="text-xl font-semibold mb-8">
+        <h3 class="text-xl dark:text-gray-50  text-gray-700 font-semibold mb-8">
           Get In Touch
         </h3>
 
         <div class="space-y-6 text-gray-400">
-
-          <!-- EMAIL -->
           <a
-            href="mailto:bagas.nugrah201@email.com?subject=Let's Work Together&body=Hi Bagas,"
-            class="group flex items-center justify-center gap-4 hover:text-blue-400 transition"
+            href="mailto:bagas.nugrah201@email.com?"
+            class="group flex items-center justify-center gap-2 dark:hover:text-blue-400 hover:text-blue-600 transition"
           >
             <PhosphorIcon 
               name="envelope"
@@ -35,7 +33,7 @@ const year = new Date().getFullYear()
             href="https://wa.me/6283893885871"
             target="_blank"
             rel="noopener noreferrer"
-            class="group flex items-center justify-center gap-4 hover:text-blue-400 transition"
+            class="group flex items-center justify-center gap-2 dark:hover:text-blue-400 hover:text-blue-600 transition"
           >
             <PhosphorIcon 
               name="phone"
@@ -49,7 +47,7 @@ const year = new Date().getFullYear()
             href="https://linkedin.com/in/bagassstn"
             target="_blank"
             rel="noopener noreferrer"
-            class="group flex items-center justify-center gap-4 hover:text-blue-400 transition"
+            class="group flex items-center justify-center gap-2 dark:hover:text-blue-400 hover:text-blue-600 transition"
           >
             <PhosphorIcon 
               name="linkedin-logo"
@@ -63,12 +61,8 @@ const year = new Date().getFullYear()
 
       <div class="border-t border-gray-800 my-12"></div>
 
-      <p class="text-gray-500 text-sm">
-        © {{ year }}
-        <span class="text-blue-400 font-medium">
-          Bagas Tricahya Nugraha
-        </span>
-        All rights reserved.
+      <p class="dark:text-gray-100 text-gray-900 text-sm">
+        © {{ year }} Bagas Tricahya Nugraha All rights reserved.
       </p>
 
     </div>

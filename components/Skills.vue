@@ -26,21 +26,21 @@ const skills = [
 </script>
 
 <template>
-  <section id="skills" class="bg-gray-900 text-white py-24 overflow-hidden">
+  <section id="skills" class="dark:bg-gray-900 bg-gray-100 dark:text-white py-24 overflow-hidden">
     
     <div class="max-w-6xl mx-auto text-center mb-12">
       <h2 class="text-4xl font-bold">
-        My <span class="text-blue-400">Skills</span>
+        My <span class="dark:text-blue-400 text-blue-800">Skills</span>
       </h2>
     </div>
 
-    <div class="relative w-full overflow-hidden">
+    <div class="relative w-full">
       <div class="flex animate-scroll gap-20 w-max">
 
         <div
           v-for="(skill, index) in [...skills, ...skills,]"
           :key="index"
-          class="flex flex-col items-center justify-center bg-gray-800 hover:bg-gray-700 transition duration-300 px-10 py-8 rounded-2xl shadow-lg min-w-[180px]"
+          class="flex flex-col items-center justify-center dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300 px-10 py-8 rounded-2xl shadow-xl min-w-[180px]"
         >
           
           <!-- ICON -->

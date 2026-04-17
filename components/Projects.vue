@@ -1,11 +1,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-// state
 const selectedProject = ref(null)
 const activeImage = ref(0)
 
-// ESC close
 const handleEsc = (e) => {
   if (e.key === 'Escape') {
     selectedProject.value = null
@@ -92,11 +90,11 @@ const projects = [
 </script>
 
 <template>
-  <section id="projects" class="bg-gray-950 text-white py-28 px-6">
+  <section id="projects" class="dark:bg-gray-950 bg-gray-50 py-28 px-6">
     <div class="max-w-6xl mx-auto">
 
-      <h2 class="text-4xl font-bold mb-16 text-center">
-        Featured <span class="text-blue-400">Projects</span>
+      <h2 class="text-4xl font-bold mb-16 text-center text-blue-800 dark:text-gray-100">
+        Featured <span class="text-gray-900 dark:text-blue-400">Projects</span>
       </h2>
 
       <!-- GRID -->
@@ -105,20 +103,20 @@ const projects = [
           v-for="(project, index) in projects"
           :key="index"
           @click="() => { selectedProject = project; activeImage = 0 }"
-          class="cursor-pointer group bg-gray-900 rounded-2xl overflow-hidden shadow-xl hover:shadow-blue-500/20 transition duration-500"
+          class="cursor-pointer group bg-gray-300 dark:bg-gray-900 rounded-2xl overflow-hidden shadow-xl hover:shadow-blue-500/20 transition duration-500"
         >
-          <div class="bg-gray-800 flex items-center justify-center h-56">
+          <div class="bg-gray-200 dark:bg-gray-800 flex items-center justify-center h-60">
             <img
               :src="project.screenshots[0]"
               class="max-h-full object-contain  group-hover:scale-105 transition"
             />
           </div>
 
-          <div class="p-6 ">
-            <h3 class="text-2xl font-semibold mb-3">
+          <div class="p-6">
+            <h3 class="text-2xl text-gray-900 dark:text-gray-50 font-semibold mb-3">
               {{ project.title }}
             </h3>
-            <p class="text-gray-400 text-sm">
+            <p class="text-gray-700 dark:text-gray-200 text-sm">
               {{ project.description }}
             </p>
           </div>
