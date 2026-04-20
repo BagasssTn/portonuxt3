@@ -48,7 +48,7 @@ onMounted(() => {
           Hello, I'm
         </p>
 
-        <h1 class="text-5xl font-bold mb-6 leading-normal dark:text-blue-400 text-blue-800">
+        <h1 class="text-5xl font-bold font-yatra mb-6 leading-normal dark:text-blue-400 text-blue-800">
           Bagas Tricahya Nugraha
         </h1>
 

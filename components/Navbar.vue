@@ -39,7 +39,7 @@ const toggleDark = () => {
   text-white dark:text-white shadow-md transition-colors duration-300">
 
     <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold dark:text-blue-400 text-blue-950
+      <h1 class="text-2xl font-yatra font-bold dark:text-blue-400 text-blue-950
       ">
         Bagas Tricahya
       </h1>

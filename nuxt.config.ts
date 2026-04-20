@@ -10,5 +10,10 @@ export default defineNuxtConfig({
   ],
   colorMode: {
     classSuffix:''
+  },
+  fonts:{
+    families: [
+      {name: 'Yatra One', provider: 'google'}
+    ]
   }
 })

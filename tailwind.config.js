@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        yatra: ['Yatra One', 'cursive']
+      },
       keyframes: {
         fadeUp: {
           '0%': {
