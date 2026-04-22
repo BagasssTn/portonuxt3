@@ -4,6 +4,10 @@ definePageMeta({
   middleware: 'admin-auth'
 })
 
+const config = useRuntimeConfig()
+const isSubmitting = ref(false)
+const submitError = ref('')
+
 const form = ref({
   role: '',
   company: '',
@@ -13,14 +17,32 @@ const form = ref({
   points: ''
 })
 
-function handleSubmit() {
-  console.log('Add experience placeholder', {
-    ...form.value,
-    points: form.value.points
-      .split('\n')
-      .map((point) => point.trim())
-      .filter(Boolean)
-  })
+async function handleSubmit() {
+  submitError.value = ''
+  isSubmitting.value = true
+
+  try {
+    await $fetch('/api/admin/experiences', {
+      method: 'POST',
+      baseURL: config.public.apiBase,
+      body: {
+        ...form.value,
+        points: form.value.points
+          .split('\n')
+          .map((point) => point.trim())
+          .filter(Boolean)
+      }
+    })
+
+    navigateTo('/admin/experience?success=created')
+  } catch (error: any) {
+    submitError.value =
+      error?.data?.message ||
+      error?.message ||
+      'Gagal menambahkan experience.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -43,6 +65,13 @@ function handleSubmit() {
         class="space-y-6 rounded-xl bg-white p-6 shadow-xl shadow-slate-300/30"
         @submit.prevent="handleSubmit"
       >
+        <div
+          v-if="submitError"
+          class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+        >
+          {{ submitError }}
+        </div>
+
         <div class="grid gap-6 md:grid-cols-2">
           <div>
             <label for="role" class="mb-2 block text-sm font-medium text-slate-700">
@@ -51,6 +80,7 @@ function handleSubmit() {
             <input
               id="role"
               v-model="form.role"
+              required
               type="text"
               placeholder="Enter role"
               class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -64,6 +94,7 @@ function handleSubmit() {
             <input
               id="company"
               v-model="form.company"
+              required
               type="text"
               placeholder="Enter company name"
               class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -79,6 +110,7 @@ function handleSubmit() {
             <input
               id="start_date"
               v-model="form.start_date"
+              required
               type="date"
               class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
             >
@@ -104,6 +136,7 @@ function handleSubmit() {
           <textarea
             id="description"
             v-model="form.description"
+            required
             rows="4"
             placeholder="Write a short description"
             class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -117,6 +150,7 @@ function handleSubmit() {
           <textarea
             id="points"
             v-model="form.points"
+            required
             rows="6"
             placeholder="Enter one point per line"
             class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -135,9 +169,10 @@ function handleSubmit() {
           </NuxtLink>
           <button
             type="submit"
-            class="inline-flex items-center justify-center rounded-lg bg-blue-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-200"
+            :disabled="isSubmitting"
+            class="inline-flex items-center justify-center rounded-lg bg-blue-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Save Experience
+            {{ isSubmitting ? 'Saving...' : 'Save Experience' }}
           </button>
         </div>
       </form>
