@@ -4,35 +4,37 @@ definePageMeta({
   middleware: 'admin-auth'
 })
 
-type ExperienceItem = {
+type ProjectItem = {
   id: number
-  role: string
-  company: string
-  start_date: string
-  end_date: string | null
+  title: string
+  slug: string
   description: string
-  points: string[]
+  fulldescription: string
+  tech: string[]
+  screenshots: string[]
+  live_url: string
 }
 
 const config = useRuntimeConfig()
 const route = useRoute()
 const isDeleteModalOpen = ref(false)
-const selectedExperience = ref<ExperienceItem | null>(null)
+const selectedProject = ref<ProjectItem | null>(null)
 const deleteErrorMessage = ref('')
 const isDeleting = ref(false)
 let successNotificationTimeout: ReturnType<typeof setTimeout> | null = null
+
 const successMessage = computed(() => {
   if (route.query.success === 'created') {
     return {
-      title: 'Experience berhasil ditambahkan.',
-      description: 'Data baru sudah masuk ke daftar experience.'
+      title: 'Project berhasil ditambahkan.',
+      description: 'Data project baru sudah masuk ke daftar project.'
     }
   }
 
   if (route.query.success === 'updated') {
     return {
-      title: 'Experience berhasil diperbarui.',
-      description: 'Perubahan data experience sudah berhasil disimpan.'
+      title: 'Project berhasil diperbarui.',
+      description: 'Perubahan data project sudah berhasil disimpan.'
     }
   }
 
@@ -40,20 +42,23 @@ const successMessage = computed(() => {
 })
 
 const {
-  data: experiences,
+  data: projects,
   pending,
   error,
   refresh
-} = await useFetch<ExperienceItem[]>('/api/admin/experiences', {
+} = await useFetch<ProjectItem[]>('/api/admin/projects', {
   baseURL: config.public.apiBase
 })
 
-function formatPeriod(start: string, end: string | null) {
-  return `${start} - ${end || 'Present'}`
+function truncateText(text: string, maxLength = 180) {
+  if (!text) return '-'
+  if (text.length <= maxLength) return text
+
+  return `${text.slice(0, maxLength).trimEnd()}...`
 }
 
-function openDeleteModal(item: ExperienceItem) {
-  selectedExperience.value = item
+function openDeleteModal(item: ProjectItem) {
+  selectedProject.value = item
   deleteErrorMessage.value = ''
   isDeleteModalOpen.value = true
 }
@@ -62,18 +67,18 @@ function closeDeleteModal() {
   if (isDeleting.value) return
 
   isDeleteModalOpen.value = false
-  selectedExperience.value = null
+  selectedProject.value = null
   deleteErrorMessage.value = ''
 }
 
-async function handleDeleteExperience() {
-  if (!selectedExperience.value) return
+async function handleDeleteProject() {
+  if (!selectedProject.value) return
 
   deleteErrorMessage.value = ''
   isDeleting.value = true
 
   try {
-    await $fetch(`/api/admin/experiences/${selectedExperience.value.id}`, {
+    await $fetch(`/api/admin/projects/${selectedProject.value.id}`, {
       method: 'DELETE',
       baseURL: config.public.apiBase
     })
@@ -85,7 +90,7 @@ async function handleDeleteExperience() {
     deleteErrorMessage.value =
       error?.data?.message ||
       error?.message ||
-      'Failed to delete the experience.'
+      'Failed to delete the project.'
   } finally {
     if (isDeleting.value) {
       isDeleting.value = false
@@ -94,7 +99,7 @@ async function handleDeleteExperience() {
 }
 
 function handleCloseNotification() {
-  navigateTo('/admin/experience', { replace: true })
+  navigateTo('/admin/project', { replace: true })
 }
 
 watch(successMessage, (value) => {
@@ -151,92 +156,141 @@ onBeforeUnmount(() => {
             Admin Panel
           </p>
           <h1 class="mt-2 text-3xl font-bold font-yatra text-slate-950">
-            Manage Experience
+            Manage Projects
           </h1>
           <p class="mt-2 text-sm text-slate-600">
-            Manage the list of work experience or organizations that appear in the portfolio.
+            Manage the portfolio project list, including technology, screenshots, and live URL.
           </p>
         </div>
 
         <NuxtLink
-          to="/admin/experience/add"
+          to="/admin/project/add"
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-200"
         >
           <PhosphorIcon name="plus-circle" class="size-5" />
-          Add Experience
+          Add Project
         </NuxtLink>
       </div>
 
       <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-300/30">
         <div class="border-b border-slate-200 px-6 py-4">
           <h2 class="text-lg font-semibold text-slate-900">
-            Experience List
+            Project List
           </h2>
         </div>
 
         <div v-if="pending" class="px-6 py-12 text-center">
-          <p class="text-sm text-slate-500">Loading experience data...</p>
+          <p class="text-sm text-slate-500">Loading project data...</p>
         </div>
 
         <div v-else-if="error" class="px-6 py-12 text-center">
           <p class="text-sm font-semibold text-red-600">
-            Gagal mengambil data experience.
+            Gagal mengambil data project.
           </p>
         </div>
 
-        <div v-else-if="experiences?.length" class="divide-y divide-slate-200">
+        <div v-else-if="projects?.length" class="divide-y divide-slate-200">
           <article
-            v-for="item in experiences"
+            v-for="item in projects"
             :key="item.id"
-            class="flex flex-col gap-5 px-6 py-5 lg:flex-row lg:items-start lg:justify-between"
+            class="flex flex-col gap-5 px-6 py-5"
           >
-            <div class="min-w-0 flex-1">
-              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h3 class="text-xl font-semibold text-slate-950">
-                  {{ item.role }}
-                </h3>
-                <span class="inline-flex w-fit rounded-sm bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                  {{ formatPeriod(item.start_date, item.end_date) }}
-                </span>
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-3">
+                      <h3 class="text-xl font-semibold text-slate-950">
+                        {{ item.title }}
+                      </h3>
+                      <span class="inline-flex w-fit rounded-sm bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        #{{ item.id }}
+                      </span>
+                    </div>
+
+                    <p class="mt-2 text-sm text-slate-500">
+                      /{{ item.slug }}
+                    </p>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
+                      <PhosphorIcon name="code" class="size-4" />
+                      {{ item.tech?.length || 0 }} tech
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
+                      <PhosphorIcon name="image" class="size-4" />
+                      {{ item.screenshots?.length || 0 }} screenshots
+                    </span>
+                    <span
+                      class="inline-flex items-center gap-2 rounded-full px-3 py-1"
+                      :class="item.live_url ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'"
+                    >
+                      <PhosphorIcon :name="item.live_url ? 'link' : 'link-break'" class="size-4" />
+                      {{ item.live_url ? 'Live URL available' : 'No Live URL' }}
+                    </span>
+                  </div>
+                </div>
+
+                <p class="mt-4 max-w-4xl text-sm leading-6 text-slate-600">
+                  {{ truncateText(item.description, 220) }}
+                </p>
+
+                <p class="mt-3 max-w-4xl text-sm leading-6 text-slate-500">
+                  {{ truncateText(item.fulldescription, 280) }}
+                </p>
+
+                <div v-if="item.tech?.length" class="mt-4 flex flex-wrap gap-2">
+                  <span
+                    v-for="techItem in item.tech"
+                    :key="techItem"
+                    class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white"
+                  >
+                    {{ techItem }}
+                  </span>
+                </div>
+
+                <a
+                  v-if="item.live_url"
+                  :href="item.live_url"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 transition hover:text-blue-900"
+                >
+                  <PhosphorIcon name="arrow-square-out" class="size-4" />
+                  Visit live project
+                </a>
               </div>
 
-              <p class="mt-1 text-sm font-medium text-slate-700">
-                {{ item.company }}
-              </p>
+              <div class="flex flex-wrap gap-3">
+                <NuxtLink
+                  :to="`/admin/project/${item.id}`"
+                  class="inline-flex items-center gap-2 rounded-lg border border-amber-600 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                >
+                  <PhosphorIcon name="pencil-simple" class="size-4" />
+                  Edit
+                </NuxtLink>
 
-              <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                {{ item.description }}
-              </p>
-            </div>
-
-            <div class="flex flex-wrap gap-3">
-              <NuxtLink
-                :to="`/admin/experience/${item.id}`"
-                class="inline-flex items-center gap-2 rounded-lg border border-amber-600 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 focus:outline-none focus:ring-4 focus:ring-amber-100"
-              >
-                <PhosphorIcon name="pencil-simple" class="size-4" />
-                Edit
-              </NuxtLink>
-
-              <button
-                type="button"
-                class="inline-flex items-center gap-2 rounded-lg border border-red-600 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-100"
-                @click="openDeleteModal(item)"
-              >
-                <PhosphorIcon name="trash" class="size-4" />
-                Delete
-              </button>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 rounded-lg border border-red-600 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-100"
+                  @click="openDeleteModal(item)"
+                >
+                  <PhosphorIcon name="trash" class="size-4" />
+                  Delete
+                </button>
+              </div>
             </div>
           </article>
         </div>
 
         <div v-else class="px-6 py-12 text-center">
-          <PhosphorIcon name="briefcase" class="mx-auto size-10 text-slate-300" />
+          <PhosphorIcon name="folders" class="mx-auto size-10 text-slate-300" />
           <p class="mt-4 text-base font-semibold text-slate-700">
-            No experience data yet
+            No project data yet
           </p>
           <p class="mt-2 text-sm text-slate-500">
-            Add your first experience entry to display it on the portfolio.
+            Add your first project entry to display it in the portfolio.
           </p>
         </div>
       </div>
@@ -258,18 +312,14 @@ onBeforeUnmount(() => {
 
           <div class="min-w-0 flex-1">
             <h2 class="text-lg font-semibold text-slate-900">
-              Delete this experience?
+              Delete this project?
             </h2>
             <p class="mt-2 text-sm leading-6 text-slate-600">
-              The experience
+              Project
               <span class="font-semibold text-slate-800">
-                {{ selectedExperience?.role }}
+                {{ selectedProject?.title }}
               </span>
-              at
-              <span class="font-semibold text-slate-800">
-                {{ selectedExperience?.company }}
-              </span>
-              will be removed from the list.
+              will be removed from the project list.
             </p>
           </div>
         </div>
@@ -294,14 +344,14 @@ onBeforeUnmount(() => {
             type="button"
             class="inline-flex items-center justify-center rounded-lg bg-rose-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-70"
             :disabled="isDeleting"
-            @click="handleDeleteExperience"
+            @click="handleDeleteProject"
           >
             {{ isDeleting ? 'Deleting...' : 'Yes, Delete' }}
           </button>
         </div>
       </div>
     </div>
-      <div class="flex flex-col gap-3 sm:flex-row pt-10 pl-[90px]">
+          <div class="flex flex-col gap-3 sm:flex-row pt-10 pl-[90px]">
         <NuxtLink
         to="/admin/dashboard"
          class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-9 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"

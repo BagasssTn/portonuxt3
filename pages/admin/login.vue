@@ -31,7 +31,7 @@ async function handleLogin() {
     })
 
     localStorage.setItem('admin_token', response.token)
-    await router.push('/admin/experience')
+    await router.push('/admin/dashboard')
   } catch (error: any) {
     errorMessage.value = error?.data?.message || 'Login gagal'
   } finally {
