@@ -22,19 +22,24 @@ const selectedProject = ref<ProjectItem | null>(null)
 const deleteErrorMessage = ref('')
 const isDeleting = ref(false)
 let successNotificationTimeout: ReturnType<typeof setTimeout> | null = null
+const notificationMessage = ref<{ title: string; description: string } | null>(null)
 
 const successMessage = computed(() => {
+  if (notificationMessage.value) {
+    return notificationMessage.value
+  }
+
   if (route.query.success === 'created') {
     return {
-      title: 'Project berhasil ditambahkan.',
-      description: 'Data project baru sudah masuk ke daftar project.'
+      title: 'Project added successfully.',
+      description: 'The new entry has been added to the project list.'
     }
   }
 
   if (route.query.success === 'updated') {
     return {
-      title: 'Project berhasil diperbarui.',
-      description: 'Perubahan data project sudah berhasil disimpan.'
+      title: 'Project updated successfully.',
+      description: 'Your changes have been saved to the project list.'
     }
   }
 
@@ -86,6 +91,10 @@ async function handleDeleteProject() {
     await refresh()
     isDeleting.value = false
     closeDeleteModal()
+    notificationMessage.value = {
+      title: 'Project deleted successfully.',
+      description: 'The selected entry has been removed from the project list.'
+    }
   } catch (error: any) {
     deleteErrorMessage.value =
       error?.data?.message ||
@@ -99,7 +108,11 @@ async function handleDeleteProject() {
 }
 
 function handleCloseNotification() {
-  navigateTo('/admin/project', { replace: true })
+  notificationMessage.value = null
+
+  if (route.query.success) {
+    navigateTo('/admin/project', { replace: true })
+  }
 }
 
 watch(successMessage, (value) => {
@@ -113,7 +126,7 @@ watch(successMessage, (value) => {
   successNotificationTimeout = setTimeout(() => {
     handleCloseNotification()
   }, 3000)
-})
+}, { immediate: true })
 
 onBeforeUnmount(() => {
   if (!successNotificationTimeout) return
@@ -127,27 +140,29 @@ onBeforeUnmount(() => {
     <div class="mx-auto max-w-6xl">
       <div
         v-if="successMessage"
-        class="mb-6 flex items-start justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-sm"
+        class="fixed left-1/2 top-6 z-50 w-full max-w-md -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-lg"
       >
-        <div class="flex items-start gap-3">
-          <PhosphorIcon name="check-circle" class="mt-0.5 size-5 shrink-0" />
-          <div>
-            <p class="text-sm font-semibold">
-              {{ successMessage.title }}
-            </p>
-            <p class="mt-1 text-sm text-emerald-700">
-              {{ successMessage.description }}
-            </p>
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <PhosphorIcon name="check-circle" class="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p class="text-sm font-semibold">
+                {{ successMessage.title }}
+              </p>
+              <p class="mt-1 text-sm text-emerald-700">
+                {{ successMessage.description }}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md p-1 text-emerald-700 transition hover:bg-emerald-100"
-          @click="handleCloseNotification"
-        >
-          <PhosphorIcon name="x" class="size-4" />
-        </button>
+          <button
+            type="button"
+            class="inline-flex items-center rounded-md p-1 text-emerald-700 transition hover:bg-emerald-100"
+            @click="handleCloseNotification"
+          >
+            <PhosphorIcon name="x" class="size-4" />
+          </button>
+        </div>
       </div>
 
       <div class="mb-8 flex flex-col gap-4 rounded-xl bg-white p-6 shadow-xl shadow-slate-300/30 sm:flex-row sm:items-center sm:justify-between">

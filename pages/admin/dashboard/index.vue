@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 definePageMeta({
     layout: false,
+    middleware: 'admin-auth'
 })
+
+async function handleLogout() {
+    localStorage.removeItem('admin_token')
+    await navigateTo('/')
+}
 </script>
 
 <template>
@@ -43,12 +49,16 @@ definePageMeta({
             </NuxtLink>
 
             <div class="flex justify-center md:col-span-2">
-                <NuxtLink to="/" class="flex min-h-[100px] w-full max-w-md items-center justify-center rounded-xl bg-red-300 px-6 py-6 text-center transition hover:bg-red-400">
+                <button
+                    type="button"
+                    class="flex min-h-[100px] w-full max-w-md items-center justify-center rounded-xl bg-red-300 px-6 py-6 text-center transition hover:bg-red-400"
+                    @click="handleLogout"
+                >
                     <PhosphorIcon name="arrow-elbow-down-left" class="mr-3 size-6"/>
                     <p class="text-lg font-semibold text-slate-900">
                         Back To Portofolio
                     </p>
-                </NuxtLink>
+                </button>
             </div>
         </div>
     </div>
