@@ -9,8 +9,9 @@ type ProjectItem = {
   title: string
   slug: string
   description: string
-  fulldescription: string
+  full_description: string
   tech: string[]
+  thumbnail: string
   screenshots: string[]
   live_url: string
 }
@@ -23,6 +24,18 @@ const deleteErrorMessage = ref('')
 const isDeleting = ref(false)
 let successNotificationTimeout: ReturnType<typeof setTimeout> | null = null
 const notificationMessage = ref<{ title: string; description: string } | null>(null)
+
+function imageUrl(path: string) {
+  if (!path) return ''
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('blob:')
+  ) {
+    return path
+  }
+  return `${config.public.apiBase}${path}`
+}
 
 const successMessage = computed(() => {
   if (notificationMessage.value) {
@@ -76,6 +89,12 @@ function closeDeleteModal() {
   deleteErrorMessage.value = ''
 }
 
+function forceCloseDeleteModal() {
+  isDeleteModalOpen.value = false
+  selectedProject.value = null
+  deleteErrorMessage.value = ''
+}
+
 async function handleDeleteProject() {
   if (!selectedProject.value) return
 
@@ -89,8 +108,8 @@ async function handleDeleteProject() {
     })
 
     await refresh()
-    isDeleting.value = false
-    closeDeleteModal()
+    forceCloseDeleteModal()
+
     notificationMessage.value = {
       title: 'Project deleted successfully.',
       description: 'The selected entry has been removed from the project list.'
@@ -101,9 +120,7 @@ async function handleDeleteProject() {
       error?.message ||
       'Failed to delete the project.'
   } finally {
-    if (isDeleting.value) {
-      isDeleting.value = false
-    }
+    isDeleting.value = false
   }
 }
 
@@ -130,7 +147,6 @@ watch(successMessage, (value) => {
 
 onBeforeUnmount(() => {
   if (!successNotificationTimeout) return
-
   clearTimeout(successNotificationTimeout)
 })
 </script>
@@ -247,12 +263,19 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
 
+                <img
+                  v-if="item.thumbnail"
+                  :src="imageUrl(item.thumbnail)"
+                  :alt="item.title"
+                  class="mt-4 h-44 w-full max-w-md rounded-lg border object-cover"
+                >
+
                 <p class="mt-4 max-w-4xl text-sm leading-6 text-slate-600">
                   {{ truncateText(item.description, 220) }}
                 </p>
 
                 <p class="mt-3 max-w-4xl text-sm leading-6 text-slate-500">
-                  {{ truncateText(item.fulldescription, 280) }}
+                  {{ truncateText(item.full_description, 280) }}
                 </p>
 
                 <div v-if="item.tech?.length" class="mt-4 flex flex-wrap gap-2">
@@ -308,6 +331,15 @@ onBeforeUnmount(() => {
             Add your first project entry to display it in the portfolio.
           </p>
         </div>
+      </div>
+
+      <div class="pt-10">
+        <NuxtLink
+          to="/admin/dashboard"
+          class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-9 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+        >
+          Back
+        </NuxtLink>
       </div>
     </div>
 
@@ -366,13 +398,5 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-          <div class="flex flex-col gap-3 sm:flex-row pt-10 pl-[90px]">
-        <NuxtLink
-        to="/admin/dashboard"
-         class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-9 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          Cancel
-        </NuxtLink>
-      </div>
   </section>
 </template>

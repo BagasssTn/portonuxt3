@@ -1,17 +1,39 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const containerRef = ref(null)
-let observer = null
+type ExperienceItem = {
+  id: number
+  role: string
+  company: string
+  start_date: string
+  end_date: string | null
+  description: string
+  points: string[]
+}
+
+const containerRef = ref<HTMLElement | null>(null)
+let observer: IntersectionObserver | null = null
 
 const config = useRuntimeConfig()
 
-const { data: experiences, pending, error } = await useFetch('/api/experiences', {
+const { data: experiences, pending, error } = await useFetch<ExperienceItem[]>('/api/experiences', {
   baseURL: config.public.apiBase
 })
 
-const formatPeriod = (start, end) => {
-  return `${start} - ${end || 'Present'}`
+function formatDisplayDate(value: string | null) {
+  if (!value) return 'Present'
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'short'
+  })
+}
+
+function formatPeriod(start: string, end: string | null) {
+  return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`
 }
 
 onMounted(() => {
@@ -23,21 +45,22 @@ onMounted(() => {
     (entries) => {
       entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-          entry.target.style.animationDelay = `${index * 0.2}s`
-          entry.target.classList.add('animate-fadeUp')
+          const target = entry.target as HTMLElement
+          target.style.animationDelay = `${index * 0.2}s`
+          target.classList.add('animate-fadeUp')
         }
       })
     },
     { threshold: 0.2 }
   )
 
-  elements.forEach((el) => observer.observe(el))
+  elements.forEach((el) => observer?.observe(el))
 })
 
 onBeforeUnmount(() => {
   if (observer && containerRef.value) {
     const elements = containerRef.value.querySelectorAll('.exp-item')
-    elements.forEach((el) => observer.unobserve(el))
+    elements.forEach((el) => observer?.unobserve(el))
   }
 })
 </script>

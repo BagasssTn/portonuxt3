@@ -91,7 +91,7 @@ const toggleDark = () => {
                 ? 'bg-gray-200 dark:bg-gray-800 text-gray-950 dark:text-white'
                 : 'text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800'"
           >
-          <PhosphorIcon name="archive" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
+          <PhosphorIcon name="folders" class="mr-1 size-5 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-[1.07]"/>
             Projects
           </NuxtLink>
         </li>

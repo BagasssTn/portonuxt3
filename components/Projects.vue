@@ -6,6 +6,18 @@ const activeImage = ref(0)
 
 const config = useRuntimeConfig()
 
+function imageUrl(path) {
+  if (!path) return ''
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('blob:')
+  ) {
+    return path
+  }
+  return `${config.public.apiBase}${path}`
+}
+
 const { data: projects, pending, error } = await useFetch('/api/projects', {
   baseURL: config.public.apiBase
 })
@@ -57,7 +69,7 @@ watch(selectedProject, (val) => {
         >
           <div class="bg-gray-200 dark:bg-gray-800 flex items-center justify-center h-60">
             <img
-              :src="project.screenshots[0]"
+              :src="imageUrl(project.thumbnail || project.screenshots?.[0])"
               class="max-h-full object-contain group-hover:scale-105 transition"
             />
           </div>
@@ -91,7 +103,7 @@ watch(selectedProject, (val) => {
         </button>
 
         <img
-          :src="selectedProject.screenshots[activeImage]"
+          :src="imageUrl(selectedProject.screenshots[activeImage])"
           class="w-full max-h-[70vh] object-contain mb-4"
         />
 
@@ -99,7 +111,7 @@ watch(selectedProject, (val) => {
           <img
             v-for="(img, i) in selectedProject.screenshots"
             :key="i"
-            :src="img"
+            :src="imageUrl(img)"
             @click="activeImage = i"
             class="w-24 h-16 object-cover rounded cursor-pointer border-2"
             :class="activeImage === i ? 'border-blue-500' : 'border-transparent'"
@@ -111,7 +123,7 @@ watch(selectedProject, (val) => {
         </h3>
 
         <p class="text-gray-400 mb-6">
-          {{ selectedProject.fulldescription }}
+          {{ selectedProject.full_description }}
         </p>
 
         <div class="flex flex-wrap gap-2 mb-6">

@@ -42,7 +42,7 @@ async function handleLogout() {
                     <PhosphorIcon name="arrow-up-right" class="size-5"/>
                 </div>
 
-                <PhosphorIcon name="archive" class="mb-4 size-14 text-blue-950"/>
+                <PhosphorIcon name="folders" class="mb-4 size-14 text-blue-950"/>
                 <p class="text-xl font-semibold text-slate-900">
                     Project
                 </p>

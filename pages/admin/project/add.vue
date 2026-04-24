@@ -14,9 +14,14 @@ const form = ref({
   description: '',
   fulldescription: '',
   tech: '',
-  screenshots: '',
   live_url: ''
 })
+
+const thumbnailFile = ref<File | null>(null)
+const thumbnailPreview = ref('')
+
+const screenshotFiles = ref<File[]>([])
+const screenshotPreviews = ref<string[]>([])
 
 function splitLines(value: string) {
   return value
@@ -25,22 +30,103 @@ function splitLines(value: string) {
     .filter(Boolean)
 }
 
+function handleThumbnailChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0] || null
+
+  if (thumbnailPreview.value) {
+    URL.revokeObjectURL(thumbnailPreview.value)
+  }
+
+  thumbnailFile.value = file
+  thumbnailPreview.value = file ? URL.createObjectURL(file) : ''
+}
+
+function handleScreenshotsChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const files = Array.from(target.files || [])
+
+  if (!files.length) return
+
+  screenshotFiles.value = [...screenshotFiles.value, ...files]
+  screenshotPreviews.value = [
+    ...screenshotPreviews.value,
+    ...files.map((file) => URL.createObjectURL(file))
+  ]
+
+  target.value = ''
+}
+
+function removeScreenshot(index: number) {
+  const preview = screenshotPreviews.value[index]
+  if (preview && preview.startsWith('blob:')) {
+    URL.revokeObjectURL(preview)
+  }
+
+  screenshotFiles.value.splice(index, 1)
+  screenshotPreviews.value.splice(index, 1)
+}
+
+async function uploadImage(file: File) {
+  const formData = new FormData()
+  formData.append('image', file)
+
+  const response = await $fetch<{ url: string }>('/api/admin/upload', {
+    method: 'POST',
+    baseURL: config.public.apiBase,
+    body: formData
+  })
+
+  return response.url
+}
+
+async function uploadMultipleImages(files: File[]) {
+  const results: string[] = []
+
+  for (const file of files) {
+    const url = await uploadImage(file)
+    results.push(url)
+  }
+
+  return results
+}
+
 async function handleSubmit() {
   submitError.value = ''
   isSubmitting.value = true
 
   try {
+    const techList = splitLines(form.value.tech)
+
+    if (!thumbnailFile.value) {
+      submitError.value = 'Thumbnail wajib diisi.'
+      return
+    }
+
+    if (screenshotFiles.value.length === 0) {
+      submitError.value = 'Minimal pilih 1 screenshot.'
+      return
+    }
+
+    const thumbnailUrl = await uploadImage(thumbnailFile.value)
+    const screenshotUrls = await uploadMultipleImages(screenshotFiles.value)
+
     await $fetch('/api/admin/projects', {
       method: 'POST',
       baseURL: config.public.apiBase,
       body: {
-        ...form.value,
-        tech: splitLines(form.value.tech),
-        screenshots: splitLines(form.value.screenshots)
+        title: form.value.title,
+        slug: form.value.slug,
+        description: form.value.description,
+        full_description: form.value.fulldescription,
+        tech: techList,
+        thumbnail: thumbnailUrl,
+        screenshots: screenshotUrls,
+        live_url: form.value.live_url || ''
       }
     })
 
-    navigateTo('/admin/project?success=created')
+    await navigateTo('/admin/project?success=created')
   } catch (error: any) {
     submitError.value =
       error?.data?.message ||
@@ -50,6 +136,14 @@ async function handleSubmit() {
     isSubmitting.value = false
   }
 }
+
+onBeforeUnmount(() => {
+  if (thumbnailPreview.value) {
+    URL.revokeObjectURL(thumbnailPreview.value)
+  }
+
+  screenshotPreviews.value.forEach((url) => URL.revokeObjectURL(url))
+})
 </script>
 
 <template>
@@ -155,34 +249,69 @@ async function handleSubmit() {
           </div>
 
           <div>
-            <label for="screenshots" class="mb-2 block text-sm font-medium text-slate-700">
-              Screenshots
+            <label for="live_url" class="mb-2 block text-sm font-medium text-slate-700">
+              Live URL
             </label>
-            <textarea
-              id="screenshots"
-              v-model="form.screenshots"
-              required
-              rows="6"
-              placeholder="Enter one image URL per line"
+            <input
+              id="live_url"
+              v-model="form.live_url"
+              type="url"
+              placeholder="https://your-project-demo.com"
               class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
-            />
-            <p class="mt-2 text-xs text-slate-500">
-              Use a new line for each screenshot URL.
-            </p>
+            >
           </div>
         </div>
 
         <div>
-          <label for="live_url" class="mb-2 block text-sm font-medium text-slate-700">
-            Live URL
+          <label class="mb-2 block text-sm font-medium text-slate-700">
+            Thumbnail
           </label>
           <input
-            id="live_url"
-            v-model="form.live_url"
-            type="url"
-            placeholder="https://your-project-demo.com"
-            class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            @change="handleThumbnailChange"
+            class="block w-full text-sm text-slate-700"
           >
+          <img
+            v-if="thumbnailPreview"
+            :src="thumbnailPreview"
+            alt="Thumbnail preview"
+            class="mt-4 h-40 rounded-lg border object-cover"
+          >
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-slate-700">
+            Screenshots
+          </label>
+          <input
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.webp"
+            @change="handleScreenshotsChange"
+            class="block w-full text-sm text-slate-700"
+          >
+
+          <div v-if="screenshotPreviews.length" class="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
+            <div
+              v-for="(preview, index) in screenshotPreviews"
+              :key="index"
+              class="relative"
+            >
+              <img
+                :src="preview"
+                alt="Screenshot preview"
+                class="h-32 w-full rounded-lg border object-cover"
+              >
+              <button
+                type="button"
+                class="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-1 text-xs text-white"
+                @click="removeScreenshot(index)"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">

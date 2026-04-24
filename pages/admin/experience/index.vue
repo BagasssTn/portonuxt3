@@ -54,8 +54,20 @@ const {
   baseURL: config.public.apiBase
 })
 
+function formatDisplayDate(value: string | null) {
+  if (!value) return 'Present'
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'short'
+  })
+}
+
 function formatPeriod(start: string, end: string | null) {
-  return `${start} - ${end || 'Present'}`
+  return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`
 }
 
 function openDeleteModal(item: ExperienceItem) {
@@ -123,6 +135,7 @@ watch(successMessage, (value) => {
     handleCloseNotification()
   }, 3000)
 }, { immediate: true })
+
 
 onBeforeUnmount(() => {
   if (!successNotificationTimeout) return
